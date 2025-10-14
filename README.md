@@ -11,10 +11,6 @@ A modern, lightweight todo application built with React 19 and styled with Tailw
 - **Fast Development**: Powered by Vite with Hot Module Replacement (HMR)
 - **Component Architecture**: Modular, reusable React components
 
-## Demo
-
-![Todo App Screenshot](https://via.placeholder.com/800x600?text=Todo+App+Screenshot)
-
 ## Tech Stack
 
 - **React 19.2.0** - Modern React with hooks
