@@ -6,7 +6,18 @@
       "Bash(npm run build)",
       "Read(//tmp/**)",
       "Bash(curl:*)",
-      "Bash(md5:*)"
+      "Bash(md5:*)",
+      "Bash(claude mcp:*)",
+      "Bash(backlog:*)",
+      "Bash(backlog help:*)",
+      "mcp__todo-app-backlog__task_list",
+      "mcp__todo-app-backlog__task_search",
+      "mcp__todo-app-backlog__task_view",
+      "mcp__todo-app-backlog__task_create",
+      "mcp__todo-app-backlog__task_edit",
+      "mcp__todo-app-backlog__task_archive",
+      "Bash(npm test:*)",
+      "Bash(mvn spring-boot:run:*)"
     ],
     "deny": [],
     "ask": []

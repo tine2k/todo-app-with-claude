@@ -1,6 +1,6 @@
 # Todo App
 
-A modern, lightweight todo application built with React 19 and styled with Tailwind CSS v4. Features persistent storage, bulk actions, and a clean purple-themed interface.
+A full-stack todo application with a React frontend and Spring Boot Kotlin backend. Features persistent storage, bulk actions, and a clean purple-themed interface.
 
 ## Features
 
@@ -10,19 +10,29 @@ A modern, lightweight todo application built with React 19 and styled with Tailw
 - **Modern UI**: Clean, responsive design with Tailwind CSS v4
 - **Fast Development**: Powered by Vite with Hot Module Replacement (HMR)
 - **Component Architecture**: Modular, reusable React components
+- **Backend Ready**: Spring Boot Kotlin backend with health check endpoint
 
 ## Tech Stack
 
+### Frontend
 - **React 19.2.0** - Modern React with hooks
 - **Vite 7.1.9** - Lightning-fast build tool and dev server
 - **Tailwind CSS 4.1.14** - Utility-first CSS framework
 - **localStorage API** - Client-side data persistence
 
+### Backend
+- **Spring Boot 3.3.5** - Java application framework
+- **Kotlin 2.0.21** - Modern JVM language
+- **Maven** - Build automation and dependency management
+- **Java 21** - Latest LTS version
+
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 16+ and npm
+- **Node.js 16+** and npm
+- **Java 21** (JDK)
+- **Maven 3.6+**
 
 ### Installation
 
@@ -32,44 +42,80 @@ git clone git@github.com:tine2k/todo-app-with-claude.git
 cd todo-app-with-claude
 ```
 
-2. Install dependencies:
+2. **Frontend Setup**:
 ```bash
+cd frontend
 npm install
-```
-
-3. Start the development server:
-```bash
 npm run dev
 ```
+The frontend will be available at `http://localhost:3000`
 
-4. Open your browser and navigate to `http://localhost:3000`
+3. **Backend Setup** (in a new terminal):
+```bash
+cd backend
+mvn spring-boot:run
+```
+The backend will be available at `http://localhost:8080`
 
 ## Available Scripts
 
+### Frontend (from `frontend/` directory)
 - **`npm run dev`** - Start development server with HMR on port 3000
 - **`npm run build`** - Build optimized production bundle to `dist/`
 - **`npm run preview`** - Preview production build locally
+- **`npm test`** - Run tests with Vitest
+
+### Backend (from `backend/` directory)
+- **`mvn spring-boot:run`** - Start backend server on port 8080
+- **`mvn clean package`** - Build JAR file
+- **`mvn test`** - Run backend tests
+
+### Backend Endpoints
+- **`GET /health`** - Health check endpoint
+  - Returns: `{"status":"UP","service":"todo-backend"}`
+- **`GET /api/todos`** - Get all todos
+  - Returns: Array of todo objects `[{"id":1,"text":"Learn Kotlin","completed":false},...]`
+  - Currently returns 3 hardcoded todos
+  - Frontend fetches this on initial load
 
 ## Project Structure
 
 ```
 todo-app/
-├── src/
-│   ├── components/
-│   │   ├── BulkActionButton.jsx  # Reusable button component
-│   │   ├── BulkActions.jsx       # Bulk action controls
-│   │   ├── Icons.jsx              # SVG icon components
-│   │   ├── TodoInput.jsx          # Input field component
-│   │   └── TodoItem.jsx           # Individual todo item
-│   ├── App.jsx                    # Main application component
-│   ├── main.jsx                   # React entry point
-│   ├── base.css                   # Tailwind CSS imports
-│   └── index.html                 # HTML template
-├── public/                        # Static assets
-├── vite.config.mjs               # Vite configuration
-├── tailwind.config.js            # Tailwind configuration
-├── postcss.config.cjs            # PostCSS configuration
-└── package.json                  # Project dependencies
+├── frontend/                      # React application
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── BulkActionButton.jsx  # Reusable button component
+│   │   │   ├── BulkActions.jsx       # Bulk action controls
+│   │   │   ├── Icons.jsx              # SVG icon components
+│   │   │   ├── TodoInput.jsx          # Input field component
+│   │   │   └── TodoItem.jsx           # Individual todo item
+│   │   ├── App.jsx                    # Main application component
+│   │   ├── main.jsx                   # React entry point
+│   │   └── base.css                   # Tailwind CSS imports
+│   ├── public/                        # Static assets
+│   ├── vite.config.mjs               # Vite configuration
+│   ├── tailwind.config.js            # Tailwind configuration
+│   ├── postcss.config.cjs            # PostCSS configuration
+│   └── package.json                  # Frontend dependencies
+├── backend/                       # Spring Boot Kotlin application
+│   ├── src/main/
+│   │   ├── kotlin/com/todoapp/
+│   │   │   ├── TodoBackendApplication.kt  # Main application class
+│   │   │   ├── model/
+│   │   │   │   └── Todo.kt                # Todo data model
+│   │   │   ├── config/
+│   │   │   │   └── CorsConfig.kt          # CORS configuration
+│   │   │   └── controller/
+│   │   │       ├── HealthController.kt    # Health check endpoint
+│   │   │       └── TodoController.kt      # Todo API endpoint
+│   │   └── resources/
+│   │       └── application.properties     # Application configuration
+│   ├── pom.xml                   # Maven configuration
+│   └── .gitignore               # Backend gitignore
+├── backlog/                      # Task management
+├── CLAUDE.md                     # Claude Code instructions
+└── README.md                     # This file
 ```
 
 ## Component Overview
@@ -142,12 +188,12 @@ Potential features for future development:
 - [ ] Todo categories/tags
 - [ ] Due dates and reminders
 - [ ] Search and filter functionality
-- [ ] Drag-and-drop reordering
-- [ ] Dark/light theme toggle
 - [ ] Export/import todos
 - [ ] Multiple todo lists
-- [ ] Backend API integration
+- [ ] Full backend API integration (REST API for todos)
+- [ ] Database persistence (PostgreSQL/MySQL)
+- [ ] User authentication and authorization
 
 ---
 
-Made with React and Tailwind CSS
+Made with React, Tailwind CSS, Spring Boot, and Kotlin
