@@ -27,7 +27,7 @@ export default function TodoItem({
       </div>
       <input
         type="checkbox"
-        className="w-5 h-5 text-purple-600 dark:text-purple-400 rounded focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 cursor-pointer"
+        className="w-6 h-6 text-purple-600 dark:text-purple-400 rounded focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 cursor-pointer"
         checked={todo.completed}
         onChange={() => onToggle(todo.id)}
       />
@@ -35,7 +35,7 @@ export default function TodoItem({
         {todo.text}
       </span>
       <button
-        className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 transition-colors cursor-pointer flex items-center gap-2"
+        className="px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 transition-colors cursor-pointer flex items-center gap-2 min-h-[44px]"
         onClick={() => onDelete(todo.id)}
       >
         <TrashIcon />

@@ -4,26 +4,27 @@ title: >-
   On the backend, implement a persistence layer with Koltin Exposed. Save the
   data to a postres database. Create a docker-compose file that Spring Boott
   starts automatically.
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-10-23 19:04'
-updated_date: '2025-10-23 19:05'
+updated_date: '2025-10-23 19:26'
 labels: []
 dependencies: []
+ordinal: 1000
 ---
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 PostgreSQL database runs in Docker container via docker-compose
-- [ ] #2 Kotlin Exposed framework is integrated with Spring Boot backend
-- [ ] #3 TodoTable schema is created automatically on application startup
-- [ ] #4 Repository layer implements all CRUD operations (Create, Read, Update, Delete)
-- [ ] #5 TodoController uses repository instead of hardcoded data
-- [ ] #6 Data persists in PostgreSQL database across application restarts
-- [ ] #7 All existing API endpoints continue to work with database backend
-- [ ] #8 docker-compose.yml includes PostgreSQL service with proper configuration
-- [ ] #9 Application connects to database successfully on startup
-- [ ] #10 Documentation is updated with database setup instructions
+- [x] #1 PostgreSQL database runs in Docker container via docker-compose
+- [x] #2 Kotlin Exposed framework is integrated with Spring Boot backend
+- [x] #3 TodoTable schema is created automatically on application startup
+- [x] #4 Repository layer implements all CRUD operations (Create, Read, Update, Delete)
+- [x] #5 TodoController uses repository instead of hardcoded data
+- [x] #6 Data persists in PostgreSQL database across application restarts
+- [x] #7 All existing API endpoints continue to work with database backend
+- [x] #8 docker-compose.yml includes PostgreSQL service with proper configuration
+- [x] #9 Application connects to database successfully on startup
+- [x] #10 Documentation is updated with database setup instructions
 <!-- AC:END -->
 
 ## Implementation Plan

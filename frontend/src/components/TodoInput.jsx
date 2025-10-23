@@ -25,7 +25,7 @@ export default function TodoInput({ value, onChange, onSubmit, disabled = false 
       <button
         onClick={onSubmit}
         disabled={disabled}
-        className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+        className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 min-h-[44px] ${
           disabled
             ? 'bg-gray-400 dark:bg-gray-600 text-gray-200 dark:text-gray-400 cursor-not-allowed opacity-60'
             : 'bg-purple-600 dark:bg-purple-500 text-white hover:bg-purple-700 dark:hover:bg-purple-600 cursor-pointer'

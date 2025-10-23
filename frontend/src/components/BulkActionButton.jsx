@@ -9,7 +9,7 @@ export default function BulkActionButton({ onClick, variant, icon, children }) {
   };
 
   // Base styles applied to all variants
-  const baseStyles = 'px-4 py-2 border-2 rounded-lg font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap';
+  const baseStyles = 'px-4 py-2.5 border-2 rounded-lg font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap min-h-[44px]';
 
   // Get variant-specific styles
   const variantStyle = variantStyles[variant] || variantStyles.success;

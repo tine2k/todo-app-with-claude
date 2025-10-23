@@ -4,6 +4,7 @@ import BulkActions from './components/BulkActions';
 import TodoInput from './components/TodoInput';
 import DarkModeToggle from './components/DarkModeToggle';
 import ErrorDialog from './components/ErrorDialog';
+import OfflineIndicator from './components/OfflineIndicator';
 import { DocumentIcon } from './components/Icons';
 import * as todoApi from './services/todoApi';
 
@@ -30,19 +31,71 @@ export default function App() {
       });
   }, []);
 
-  // Load dark mode preference from localStorage on mount
+  // Load dark mode preference from backend on mount, fallback to localStorage
   useEffect(() => {
-    const storedDarkMode = localStorage.getItem('darkMode');
-    if (storedDarkMode !== null) {
-      setDarkMode(JSON.parse(storedDarkMode));
-    }
+    todoApi.fetchPreferences()
+      .then(preferences => {
+        setDarkMode(preferences.darkMode);
+        // Sync to localStorage for offline fallback
+        localStorage.setItem('darkMode', JSON.stringify(preferences.darkMode));
+      })
+      .catch(error => {
+        console.error('Failed to fetch preferences from backend:', error);
+        // Fallback to localStorage
+        const storedDarkMode = localStorage.getItem('darkMode');
+        if (storedDarkMode !== null) {
+          setDarkMode(JSON.parse(storedDarkMode));
+        }
+      });
   }, []);
 
-
-  // Save dark mode preference to localStorage whenever it changes
+  // Save dark mode preference to backend and localStorage whenever it changes
   useEffect(() => {
+    // Skip on initial render (darkMode starts as false)
+    // We only want to save when user actively toggles
+    if (darkMode === false && localStorage.getItem('darkMode') === null) {
+      return;
+    }
+
+    // Save to localStorage immediately for offline support
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
+
+    // Save to backend
+    todoApi.updatePreferences(darkMode)
+      .then(() => {
+        console.log('Preferences saved to backend');
+      })
+      .catch(error => {
+        console.error('Failed to save preferences to backend:', error);
+        // localStorage already has the value, so no need to revert
+      });
   }, [darkMode]);
+
+  // Listen for online event and process offline queue
+  useEffect(() => {
+    const handleOnline = async () => {
+      console.log('[App] Connection restored, processing offline queue');
+      try {
+        const result = await todoApi.processOfflineQueue();
+        if (result && result.synced > 0) {
+          console.log(`[App] Synced ${result.synced} offline requests`);
+          // Refresh todos after syncing
+          const data = await todoApi.fetchTodos();
+          if (data && data.length > 0) {
+            setTodos(data);
+          }
+        }
+      } catch (error) {
+        console.error('[App] Failed to process offline queue:', error);
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
 
   const addTodo = async () => {
     const text = inputValue.trim();
@@ -206,6 +259,7 @@ export default function App() {
 
   return (
     <>
+      <OfflineIndicator />
       <ErrorDialog
         isOpen={backendError}
         onClose={closeErrorDialog}

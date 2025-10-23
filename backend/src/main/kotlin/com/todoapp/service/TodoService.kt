@@ -1,79 +1,53 @@
 package com.todoapp.service
 
 import com.todoapp.model.Todo
+import com.todoapp.repository.TodoRepository
 import org.springframework.stereotype.Service
 
 @Service
-class TodoService {
+class TodoService(private val todoRepository: TodoRepository) {
 
     companion object {
-        private const val MAX_TODOS = 4
+        private const val MAX_TODOS = 100
     }
 
-    private val todos = mutableListOf<Todo>(
-        Todo(1, "Learn Kotlin", false),
-        Todo(2, "Build Spring Boot API", true),
-        Todo(3, "Connect React Frontend", false)
-    )
-
-    private var nextId = 4L
-
-    @Synchronized
     fun getAllTodos(): List<Todo> {
-        return todos.toList()
+        return todoRepository.findAll()
     }
 
-    @Synchronized
     fun addTodo(text: String): Result<Todo> {
-        if (todos.size >= MAX_TODOS) {
+        if (todoRepository.findAll().size >= MAX_TODOS) {
             return Result.failure(IllegalStateException("Maximum of $MAX_TODOS todos allowed"))
         }
 
-        val newTodo = Todo(nextId++, text, false)
-        todos.add(newTodo)
+        val newTodo = todoRepository.save(text, completed = false)
         return Result.success(newTodo)
     }
 
-    @Synchronized
     fun updateTodo(id: Long, text: String?, completed: Boolean?): Todo? {
-        val index = todos.indexOfFirst { it.id == id }
-        if (index == -1) return null
-
-        val todo = todos[index]
-        val updatedTodo = todo.copy(
-            text = text ?: todo.text,
-            completed = completed ?: todo.completed
-        )
-        todos[index] = updatedTodo
-        return updatedTodo
+        return todoRepository.update(id, text, completed)
     }
 
-    @Synchronized
     fun deleteTodo(id: Long): Boolean {
-        return todos.removeIf { it.id == id }
+        return todoRepository.deleteById(id)
     }
 
-    @Synchronized
     fun deleteAllTodos() {
-        todos.clear()
+        todoRepository.deleteAll()
     }
 
-    @Synchronized
     fun reorderTodos(orderedIds: List<Long>): Boolean {
-        // Verify all IDs exist
-        if (orderedIds.size != todos.size || !orderedIds.all { id -> todos.any { it.id == id } }) {
+        val allTodos = todoRepository.findAll()
+
+        // Verify all IDs exist and the count matches
+        if (orderedIds.size != allTodos.size || !orderedIds.all { id -> allTodos.any { it.id == id } }) {
             return false
         }
 
-        // Create a map for quick lookup
-        val todoMap = todos.associateBy { it.id }
+        // Create a map of ID to new position (position is the index in the orderedIds list)
+        val idToPositionMap = orderedIds.mapIndexed { index, id -> id to index }.toMap()
 
-        // Reorder based on the provided IDs
-        todos.clear()
-        orderedIds.forEach { id ->
-            todoMap[id]?.let { todos.add(it) }
-        }
-
-        return true
+        // Update positions in the database
+        return todoRepository.updatePositions(idToPositionMap)
     }
 }

@@ -33,14 +33,27 @@ todo-app/
 │   │   │   ├── TodoBackendApplication.kt  # Main application class
 │   │   │   ├── model/
 │   │   │   │   └── Todo.kt                # Todo data model
+│   │   │   ├── database/
+│   │   │   │   ├── TodoTable.kt           # Exposed table schema
+│   │   │   │   └── DatabaseConfig.kt      # Database initialization
+│   │   │   ├── repository/
+│   │   │   │   ├── TodoRepository.kt      # Repository interface
+│   │   │   │   └── TodoRepositoryImpl.kt  # Repository implementation
+│   │   │   ├── service/
+│   │   │   │   └── TodoService.kt         # Business logic
 │   │   │   ├── config/
 │   │   │   │   └── CorsConfig.kt          # CORS configuration
-│   │   │   └── controller/
-│   │   │       ├── HealthController.kt    # Health check endpoint
-│   │   │       └── TodoController.kt      # Todo API endpoint
+│   │   │   ├── controller/
+│   │   │   │   ├── HealthController.kt    # Health check endpoint
+│   │   │   │   └── TodoController.kt      # Todo API endpoints
+│   │   │   └── dto/
+│   │   │       ├── CreateTodoRequest.kt   # Create todo DTO
+│   │   │       ├── UpdateTodoRequest.kt   # Update todo DTO
+│   │   │       └── ReorderRequest.kt      # Reorder todos DTO
 │   │   └── resources/
-│   │       └── application.properties     # App configuration (port 8080)
+│   │       └── application.properties     # App configuration (port 8080, DB config)
 │   ├── target/                        # Maven build output (gitignored)
+│   ├── docker-compose.yml             # PostgreSQL database configuration
 │   ├── pom.xml                        # Maven configuration
 │   └── .gitignore                     # Backend-specific ignores
 ├── backlog/              # Task management (gitignored)
@@ -57,9 +70,13 @@ todo-app/
 - `npm test` - Run tests with Vitest
 
 ### Backend (from `backend/` directory)
+- `docker compose up -d` - Start PostgreSQL database in Docker
+- `docker compose down` - Stop PostgreSQL database
 - `mvn spring-boot:run` - Start Spring Boot application on port 8080
 - `mvn clean package` - Build JAR file (outputs to `target/` directory)
 - `mvn test` - Run backend tests
+
+**Note**: PostgreSQL database must be running before starting the Spring Boot application.
 
 ## Build Systems
 
@@ -97,11 +114,23 @@ The backend uses Maven for dependency management and building:
 - **autoprefixer** (^10.4.21) - Vendor prefix automation
 
 ### Backend Dependencies
-- **spring-boot-starter-web** (3.3.5) - Web application support with embedded Tomcat
+**Core:**
+- **spring-boot-starter-web** (3.5.5) - Web application support with embedded Tomcat
+- **spring-boot-starter-jdbc** (3.5.5) - JDBC support with HikariCP connection pool
 - **kotlin-stdlib** (2.0.21) - Kotlin standard library
 - **kotlin-reflect** (2.0.21) - Kotlin reflection library (required by Spring)
 - **jackson-module-kotlin** - JSON serialization support for Kotlin
-- **spring-boot-starter-test** (3.3.5) - Testing framework (test scope)
+
+**Database:**
+- **postgresql** - PostgreSQL JDBC driver
+- **exposed-core** (0.56.0) - Kotlin SQL framework core
+- **exposed-dao** (0.56.0) - DAO pattern support for Exposed
+- **exposed-jdbc** (0.56.0) - JDBC integration for Exposed
+- **exposed-spring-boot-starter** (0.56.0) - Spring Boot auto-configuration for Exposed
+- **exposed-java-time** (0.56.0) - Java Time API support for Exposed
+
+**Testing:**
+- **spring-boot-starter-test** (3.5.5) - Testing framework (test scope)
 
 ## Architecture
 
@@ -129,32 +158,67 @@ TodoBackendApplication (backend/src/main/kotlin/com/todoapp/)
 ├── model/
 │   └── Todo (data class)
 │       └── Properties: id (Long), text (String), completed (Boolean)
+├── database/
+│   ├── TodoTable (Exposed Table object)
+│   │   └── Columns: id (Long), text (String), completed (Boolean), createdAt (Instant)
+│   └── TodoSchemaInitializer (ApplicationRunner)
+│       └── Creates tables on startup using SchemaUtils
+├── repository/
+│   ├── TodoRepository (interface)
+│   │   └── Methods: findAll, findById, save, update, deleteById, deleteAll
+│   └── TodoRepositoryImpl (@Repository)
+│       └── Implements CRUD operations using Exposed transaction DSL
+├── service/
+│   └── TodoService (@Service)
+│       └── Business logic layer with repository integration
+├── dto/
+│   ├── CreateTodoRequest - Request for creating todos
+│   ├── UpdateTodoRequest - Request for updating todos
+│   └── ReorderRequest - Request for reordering todos
 ├── config/
 │   └── CorsConfig
 │       └── Allows: localhost:3000, methods: GET/POST/PUT/DELETE
-├── controller/
-│   ├── HealthController
-│   │   └── GET /health → {"status":"UP","service":"todo-backend"}
-│   └── TodoController
-│       └── GET /api/todos → [{"id":1,"text":"...","completed":false},...]
+└── controller/
+    ├── HealthController
+    │   └── GET /health → {"status":"UP","service":"todo-backend"}
+    └── TodoController
+        ├── GET /api/todos → List all todos
+        ├── POST /api/todos → Create new todo
+        ├── PUT /api/todos/{id} → Update todo
+        ├── DELETE /api/todos/{id} → Delete todo
+        ├── DELETE /api/todos → Delete all todos
+        └── PUT /api/todos/reorder → Reorder todos
 ```
 
 **Technology Stack:**
-- **Spring Boot 3.3.5** - Application framework with auto-configuration
+- **Spring Boot 3.5.5** - Application framework with auto-configuration
 - **Embedded Tomcat** - Web server running on port 8080
 - **Kotlin 2.0.21** - Primary language with full Spring support
 - **Jackson Kotlin Module** - JSON serialization/deserialization
+- **Kotlin Exposed 0.56.0** - Kotlin SQL framework with DSL
+- **PostgreSQL 16** - Relational database running in Docker
+- **HikariCP** - High-performance JDBC connection pool
 - **CORS** - Global configuration allowing frontend (port 3000) access
 
 **Configuration:**
-- `application.properties` - Server port (8080), application name, logging level
+- `application.properties` - Server port (8080), database connection, Exposed settings
+- `docker-compose.yml` - PostgreSQL container configuration (port 5432)
 - `CorsConfig.kt` - CORS configuration for /api/** endpoints
 
+**Database Schema:**
+- **Table**: `todos`
+  - `id` BIGSERIAL PRIMARY KEY
+  - `text` VARCHAR(500)
+  - `completed` BOOLEAN DEFAULT FALSE
+  - `created_at` TIMESTAMP DEFAULT NOW()
+
 **Data Flow:**
-1. Frontend loads: `useEffect` calls `GET /api/todos`
-2. Backend returns 3 hardcoded todos
-3. Frontend displays todos and saves to localStorage
-4. Changes persist in localStorage only (backend is read-only)
+1. Docker Compose starts PostgreSQL database on port 5432
+2. Spring Boot connects to database via HikariCP connection pool
+3. Exposed framework initializes and creates tables if they don't exist
+4. Frontend calls REST API endpoints
+5. Controller → Service → Repository → Exposed → PostgreSQL
+6. Data persists in PostgreSQL database across application restarts
 
 ### Main Application Component (frontend/src/App.jsx)
 
