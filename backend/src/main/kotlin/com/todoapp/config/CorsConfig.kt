@@ -13,5 +13,11 @@ class CorsConfig : WebMvcConfigurer {
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true)
+
+        registry.addMapping("/actuator/**")
+            .allowedOrigins("http://localhost:3000")
+            .allowedMethods("GET", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true)
     }
 }
