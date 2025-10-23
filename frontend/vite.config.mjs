@@ -2,9 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Increment this version number whenever the frontend is changed
-const APP_VERSION = '1.0.1';
-
 export default defineConfig({
   plugins: [
     react(),
@@ -99,8 +96,5 @@ export default defineConfig({
   },
   server: {
     port: 3000
-  },
-  define: {
-    __APP_VERSION__: JSON.stringify(APP_VERSION),
   }
 });

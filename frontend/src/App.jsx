@@ -5,8 +5,10 @@ import TodoInput from './components/TodoInput';
 import DarkModeToggle from './components/DarkModeToggle';
 import ErrorDialog from './components/ErrorDialog';
 import OfflineIndicator from './components/OfflineIndicator';
+import UpdateNotification from './components/UpdateNotification';
 import { DocumentIcon } from './components/Icons';
 import * as todoApi from './services/todoApi';
+import { APP_VERSION } from './version';
 
 export default function App() {
   const [todos, setTodos] = useState([]);
@@ -15,6 +17,8 @@ export default function App() {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [backendError, setBackendError] = useState(false);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [serviceWorkerRegistration, setServiceWorkerRegistration] = useState(null);
 
   // Load todos from backend on mount
   useEffect(() => {
@@ -91,6 +95,21 @@ export default function App() {
 
     return () => {
       window.removeEventListener('online', handleOnline);
+    };
+  }, []);
+
+  // Listen for service worker update events
+  useEffect(() => {
+    const handleUpdateAvailable = (event) => {
+      console.log('[App] Update available, showing notification');
+      setUpdateAvailable(true);
+      setServiceWorkerRegistration(event.detail.registration);
+    };
+
+    window.addEventListener('swUpdateAvailable', handleUpdateAvailable);
+
+    return () => {
+      window.removeEventListener('swUpdateAvailable', handleUpdateAvailable);
     };
   }, []);
 
@@ -247,9 +266,31 @@ export default function App() {
     }
   };
 
+  const handleUpdateNow = () => {
+    if (serviceWorkerRegistration && serviceWorkerRegistration.waiting) {
+      // Tell the service worker to skip waiting and activate immediately
+      serviceWorkerRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+      // Listen for the controlling service worker to change, then reload
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+    }
+  };
+
+  const handleDismissUpdate = () => {
+    setUpdateAvailable(false);
+  };
+
   return (
     <>
       <OfflineIndicator />
+      <UpdateNotification
+        isVisible={updateAvailable}
+        onUpdate={handleUpdateNow}
+        onDismiss={handleDismissUpdate}
+        darkMode={darkMode}
+      />
       <ErrorDialog
         isOpen={backendError}
         onClose={closeErrorDialog}
@@ -274,7 +315,7 @@ export default function App() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <h1 className={`text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-              My Todo List
+              Todo List
             </h1>
             <a
               href="/todo-wikipedia.pdf"
@@ -323,6 +364,10 @@ export default function App() {
           onSubmit={addTodo}
           disabled={false}
         />
+
+        <div className={`text-center mt-6 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+          v{APP_VERSION}
+        </div>
       </div>
     </div>
     </>
