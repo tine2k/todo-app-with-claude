@@ -18,7 +18,7 @@ export default function App() {
   const [backendError, setBackendError] = useState(false);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [serviceWorkerRegistration, setServiceWorkerRegistration] = useState(null);
+  const [updateSW, setUpdateSW] = useState(null);
 
   // Load todos from backend on mount
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function App() {
     const handleUpdateAvailable = (event) => {
       console.log('[App] Update available, showing notification');
       setUpdateAvailable(true);
-      setServiceWorkerRegistration(event.detail.registration);
+      setUpdateSW(() => event.detail.updateSW);
     };
 
     window.addEventListener('swUpdateAvailable', handleUpdateAvailable);
@@ -267,14 +267,14 @@ export default function App() {
   };
 
   const handleUpdateNow = () => {
-    if (serviceWorkerRegistration && serviceWorkerRegistration.waiting) {
-      // Tell the service worker to skip waiting and activate immediately
-      serviceWorkerRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
-
-      // Listen for the controlling service worker to change, then reload
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload();
-      });
+    console.log('[App] Update button clicked, updateSW:', typeof updateSW);
+    if (updateSW) {
+      console.log('[App] Calling updateSW() to reload with new version');
+      // Call the updateSW function provided by vite-plugin-pwa
+      // In prompt mode, call without arguments to trigger reload
+      updateSW();
+    } else {
+      console.error('[App] updateSW function not available');
     }
   };
 
