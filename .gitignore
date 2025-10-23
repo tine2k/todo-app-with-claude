@@ -41,6 +41,3 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
-
-# Backlog (task management)
-backlog/
