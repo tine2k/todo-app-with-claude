@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './base.css';
+import { registerSW } from 'virtual:pwa-register';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -9,40 +10,32 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 );
 
-// Register service worker for PWA functionality
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then((registration) => {
-        console.log('[PWA] Service Worker registered successfully:', registration.scope);
+// Register service worker using vite-plugin-pwa
+const updateSW = registerSW({
+  onNeedRefresh() {
+    console.log('[PWA] New content available, please refresh.');
+    // Dispatch custom event to notify the app (for UpdateNotification component)
+    window.dispatchEvent(new CustomEvent('swUpdateAvailable', {
+      detail: { updateSW }
+    }));
+  },
+  onOfflineReady() {
+    console.log('[PWA] App ready to work offline');
+  },
+  onRegistered(registration) {
+    console.log('[PWA] Service Worker registered successfully:', registration?.scope);
 
-        // Check for updates periodically
-        setInterval(() => {
-          registration.update();
-        }, 60000); // Check every minute
-
-        // Listen for new service worker waiting
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[PWA] New content available, please refresh.');
-              // Optionally show a notification to the user
-            }
-          });
-        });
-      })
-      .catch((error) => {
-        console.error('[PWA] Service Worker registration failed:', error);
-      });
-  });
-
-  // Handle service worker messages
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    console.log('[PWA] Message from service worker:', event.data);
-  });
-}
+    // Check for updates periodically
+    if (registration) {
+      setInterval(() => {
+        registration.update();
+      }, 60000); // Check every minute
+    }
+  },
+  onRegisterError(error) {
+    console.error('[PWA] Service Worker registration failed:', error);
+  }
+});
 
 // Handle PWA install prompt
 let deferredPrompt;
