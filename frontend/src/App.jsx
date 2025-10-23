@@ -8,14 +8,13 @@ import OfflineIndicator from './components/OfflineIndicator';
 import { DocumentIcon } from './components/Icons';
 import * as todoApi from './services/todoApi';
 
-const MAX_TODOS = 4;
-
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [backendError, setBackendError] = useState(false);
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
 
   // Load todos from backend on mount
   useEffect(() => {
@@ -36,6 +35,7 @@ export default function App() {
     todoApi.fetchPreferences()
       .then(preferences => {
         setDarkMode(preferences.darkMode);
+        setPreferencesLoaded(true);
         // Sync to localStorage for offline fallback
         localStorage.setItem('darkMode', JSON.stringify(preferences.darkMode));
       })
@@ -46,14 +46,14 @@ export default function App() {
         if (storedDarkMode !== null) {
           setDarkMode(JSON.parse(storedDarkMode));
         }
+        setPreferencesLoaded(true);
       });
   }, []);
 
   // Save dark mode preference to backend and localStorage whenever it changes
   useEffect(() => {
-    // Skip on initial render (darkMode starts as false)
-    // We only want to save when user actively toggles
-    if (darkMode === false && localStorage.getItem('darkMode') === null) {
+    // Skip until preferences are loaded from backend
+    if (!preferencesLoaded) {
       return;
     }
 
@@ -62,14 +62,11 @@ export default function App() {
 
     // Save to backend
     todoApi.updatePreferences(darkMode)
-      .then(() => {
-        console.log('Preferences saved to backend');
-      })
       .catch(error => {
         console.error('Failed to save preferences to backend:', error);
         // localStorage already has the value, so no need to revert
       });
-  }, [darkMode]);
+  }, [darkMode, preferencesLoaded]);
 
   // Listen for online event and process offline queue
   useEffect(() => {
@@ -102,11 +99,6 @@ export default function App() {
 
     if (text === '') {
       alert('Please enter a task!');
-      return;
-    }
-
-    if (todos.length >= MAX_TODOS) {
-      alert('Maximum of 4 todos allowed. Please complete or delete existing tasks.');
       return;
     }
 
@@ -255,8 +247,6 @@ export default function App() {
     }
   };
 
-  const isMaxReached = todos.length >= MAX_TODOS;
-
   return (
     <>
       <OfflineIndicator />
@@ -331,7 +321,7 @@ export default function App() {
           value={inputValue}
           onChange={setInputValue}
           onSubmit={addTodo}
-          disabled={isMaxReached}
+          disabled={false}
         />
       </div>
     </div>

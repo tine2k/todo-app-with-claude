@@ -33,7 +33,13 @@
       "Bash(npm uninstall:*)",
       "Bash(mvn clean compile:*)",
       "Bash(/dev/null)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(for:*)",
+      "Bash(do curl -s -X POST http://localhost:8080/api/todos -H \"Content-Type: application/json\" -d \"{\"\"text\"\":\"\"Task $i\"\"}\")",
+      "Bash(done)",
+      "Bash(docker exec:*)",
+      "Bash(git rm:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

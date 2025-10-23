@@ -7,19 +7,11 @@ import org.springframework.stereotype.Service
 @Service
 class TodoService(private val todoRepository: TodoRepository) {
 
-    companion object {
-        private const val MAX_TODOS = 100
-    }
-
     fun getAllTodos(): List<Todo> {
         return todoRepository.findAll()
     }
 
     fun addTodo(text: String): Result<Todo> {
-        if (todoRepository.findAll().size >= MAX_TODOS) {
-            return Result.failure(IllegalStateException("Maximum of $MAX_TODOS todos allowed"))
-        }
-
         val newTodo = todoRepository.save(text, completed = false)
         return Result.success(newTodo)
     }

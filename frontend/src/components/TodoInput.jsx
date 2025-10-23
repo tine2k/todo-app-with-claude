@@ -11,7 +11,7 @@ export default function TodoInput({ value, onChange, onSubmit, disabled = false 
     <div className="flex gap-3">
       <input
         type="text"
-        placeholder={disabled ? "Maximum 4 todos reached" : "Add a new task..."}
+        placeholder="Add a new task..."
         className={`flex-1 px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
           disabled
             ? 'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
