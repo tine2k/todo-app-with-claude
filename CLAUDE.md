@@ -78,6 +78,26 @@ todo-app/
 
 **Note**: PostgreSQL database must be running before starting the Spring Boot application.
 
+## Frontend Versioning
+
+**CRITICAL**: Whenever you make ANY changes to the frontend code (components, styles, logic, etc.), you MUST increment the `APP_VERSION` constant.
+
+- **Location**: [frontend/src/App.jsx](frontend/src/App.jsx) - exported constant at the top of the file
+- **Format**: Semantic versioning (e.g., "1.0.0", "1.0.1", "1.1.0")
+- **Purpose**: Triggers service worker updates and notifies users to reload for new features/fixes
+- **When to update**:
+  - Bug fixes → increment patch version (1.0.0 → 1.0.1)
+  - New features → increment minor version (1.0.1 → 1.1.0)
+  - Breaking changes → increment major version (1.1.0 → 2.0.0)
+
+**Workflow**:
+1. Make your frontend changes
+2. Increment APP_VERSION in [App.jsx](frontend/src/App.jsx)
+3. Build the application with `npm run build`
+4. The service worker will detect the version change and prompt users to update
+
+**Why this matters**: The PWA service worker caches all frontend assets. Without a version bump, users won't receive updates until they manually clear their cache. The APP_VERSION is displayed in the update notification to inform users what version they're updating to.
+
 ## Build Systems
 
 ### Frontend Build (Vite)

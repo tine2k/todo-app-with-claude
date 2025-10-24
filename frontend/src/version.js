@@ -1,2 +1,2 @@
 // Increment this version number whenever the frontend is changed
-export const APP_VERSION = '0.0.5';
+export const APP_VERSION = '0.0.6';
