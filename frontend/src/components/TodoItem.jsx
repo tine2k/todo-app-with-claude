@@ -16,7 +16,7 @@ export default function TodoItem({
       onDragStart={() => onDragStart(index)}
       onDragOver={(e) => onDragOver(e, index)}
       onDragEnd={onDragEnd}
-      className={`flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all ${
+      className={`flex items-center gap-3 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all ${
         todo.completed ? 'opacity-60' : ''
       } ${
         isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab'

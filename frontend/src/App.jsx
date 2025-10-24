@@ -61,6 +61,13 @@ export default function App() {
       return;
     }
 
+    // Set/remove dark class on document root for Tailwind dark mode
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     // Save to localStorage immediately for offline support
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
 
@@ -289,7 +296,6 @@ export default function App() {
         isVisible={updateAvailable}
         onUpdate={handleUpdateNow}
         onDismiss={handleDismissUpdate}
-        darkMode={darkMode}
       />
       <ErrorDialog
         isOpen={backendError}
@@ -302,30 +308,19 @@ export default function App() {
           'Start the server: mvn spring-boot:run',
           'Refresh this page once the backend is running'
         ]}
-        darkMode={darkMode}
       />
-      <div className={`min-h-screen flex items-center justify-center p-5 transition-colors ${
-        darkMode
-          ? 'bg-gradient-to-br from-gray-800 to-gray-900'
-          : 'bg-gradient-to-br from-purple-600 to-purple-900'
-      }`}>
-        <div className={`rounded-xl shadow-2xl p-8 max-w-md w-full transition-colors ${
-          darkMode ? 'bg-gray-800 dark' : 'bg-white'
-        }`}>
+      <div className="min-h-screen flex items-center justify-center p-5 transition-colors bg-gradient-to-br from-purple-600 to-purple-900 dark:from-gray-800 dark:to-gray-900">
+        <div className="rounded-xl shadow-2xl p-8 max-w-md w-full transition-colors bg-white dark:bg-gray-800">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <h1 className={`text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
               Todo List
             </h1>
             <a
               href="/todo-wikipedia.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                darkMode
-                  ? 'text-purple-400 hover:text-purple-300 hover:bg-gray-700'
-                  : 'text-purple-600 hover:text-purple-700 hover:bg-purple-50'
-              }`}
+              className="p-2 rounded-lg transition-colors cursor-pointer text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-gray-700"
               title="Open Todo Wikipedia PDF"
             >
               <DocumentIcon />
@@ -365,7 +360,7 @@ export default function App() {
           disabled={false}
         />
 
-        <div className={`text-center mt-6 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+        <div className="text-center mt-6 text-xs text-gray-400 dark:text-gray-500">
           v{APP_VERSION}
         </div>
       </div>

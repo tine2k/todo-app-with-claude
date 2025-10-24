@@ -1,4 +1,4 @@
-export default function ErrorDialog({ isOpen, onClose, title, message, actionSteps, darkMode }) {
+export default function ErrorDialog({ isOpen, onClose, title, message, actionSteps }) {
   if (!isOpen) return null;
 
   return (
@@ -10,30 +10,24 @@ export default function ErrorDialog({ isOpen, onClose, title, message, actionSte
       />
 
       {/* Modal */}
-      <div className={`relative rounded-xl shadow-2xl p-6 max-w-md w-full animate-scaleIn ${
-        darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-      }`}>
+      <div className="relative rounded-xl shadow-2xl p-6 max-w-md w-full animate-scaleIn bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
         {/* Title */}
         <h2 className="text-2xl font-bold mb-4 text-red-500">
           {title}
         </h2>
 
         {/* Message */}
-        <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <p className="mb-4 text-gray-600 dark:text-gray-300">
           {message}
         </p>
 
         {/* Action Steps */}
         {actionSteps && actionSteps.length > 0 && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            darkMode ? 'bg-gray-700' : 'bg-gray-50'
-          }`}>
-            <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+          <div className="mb-6 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+            <p className="font-semibold mb-2 text-gray-700 dark:text-gray-200">
               What to do:
             </p>
-            <ol className={`list-decimal list-inside space-y-1 text-sm ${
-              darkMode ? 'text-gray-300' : 'text-gray-600'
-            }`}>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
               {actionSteps.map((step, index) => (
                 <li key={index}>{step}</li>
               ))}
